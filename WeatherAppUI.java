@@ -76,28 +76,45 @@ public class WeatherAppUI extends javax.swing.JFrame {
            return; // end the method early
         }
              
+        //display title location
+        String location_head = userInput.substring(1, userInput.length()-1); 
+        String capitalizedUserInput = userInput.substring(0, 1).toUpperCase() + userInput.substring(1);
+
+        // Set the capitalized string to Location_Search_Display
+        Location_Search_Display.setText(capitalizedUserInput);
+
         //update weather image
         String weatherCondition = (String) weatherData.get("weather_condition");
         
-        //we could compare time + condition to do specific images
+         //we could compare time + condition to do specific images
         switch(weatherCondition) {
             case "Clear Sky":
-                 Weather_Display.setIcon(new ImageIcon(getClass().getResource("/Assets/cloudy.png")));
-
+                Weather_Display.setIcon(new ImageIcon(getClass().getResource("/Assets/sun.png")));
+                break;
+            case "Sunny": // Added case for Sunny
+                Weather_Display.setIcon(new ImageIcon(getClass().getResource("/Assets/sunny.png"))); // Ensure you have a sunny.png asset
                 break;
             case "Cloudy":
-                  Weather_Display.setIcon(new ImageIcon(getClass().getResource("/Assets/cloudy_sunny.png")));
+                Weather_Display.setIcon(new ImageIcon(getClass().getResource("/Assets/cloudy.png")));
                 break;
             case "Snow":
-                  Weather_Display.setIcon(new ImageIcon(getClass().getResource("/Assets/snowing.png")));
+                Weather_Display.setIcon(new ImageIcon(getClass().getResource("/Assets/snowing.png")));
                 break;
             case "Rain":
-                  Weather_Display.setIcon(new ImageIcon(getClass().getResource("/Assets/rain_showers.png")));
+                Weather_Display.setIcon(new ImageIcon(getClass().getResource("/Assets/rain.png")));
                 break;
-                
-              
+            case "Fog": // Added case for Fog
+                Weather_Display.setIcon(new ImageIcon(getClass().getResource("/Assets/windy.png"))); // Ensure you have a fog.png asset
+                break;
+            case "Thunderstorm": // Added case for Thunderstorm
+                Weather_Display.setIcon(new ImageIcon(getClass().getResource("/Assets/storm.png"))); // Ensure you have a thunderstorm.png asset
+                break;
+            default: // Added default case for any other condition
+                Weather_Display.setIcon(new ImageIcon(getClass().getResource("/Assets/meteorology.png"))); // Ensure you have an unobserved.png or similar asset for unknown conditions
+                break;
         }
-        
+
+        SearchBox.setText("");
          // update temperature text
          double temperature = (double) weatherData.get("temperature");
          Temperature_Display.setText(temperature + " C");
@@ -107,11 +124,11 @@ public class WeatherAppUI extends javax.swing.JFrame {
 
          // update humidity text
          long humidity = (long) weatherData.get("humidity");
-         Humidity_Display.setText("<html><b>Humidity</b> " + humidity + "%</html>");
+         Humidity_Display.setText(humidity + "%");
 
          // update windspeed text
           double windspeed = (double) weatherData.get("windspeed");
-          WindSpeed_Display.setText("<html><b>Windspeed</b> " + windspeed + "km/h</html>");
+          WindSpeed_Display.setText(windspeed + "km");
     }
     
     public static JSONObject getWeatherData(String locationName) {
@@ -298,23 +315,26 @@ public class WeatherAppUI extends javax.swing.JFrame {
     }
     
     private static String convertWeatherCode(long weathercode) {
-         String weatherCondition = "";
-         if(weathercode == 0L) {
-             weatherCondition = "Clear Sky";
-         } else if(weathercode <= 3L && weathercode < 0L) {
-             weatherCondition = "Cloudy";
-         } else if(weathercode >= 51L && weathercode <= 67L || (weathercode >= 80L && weathercode <= 99L)) {
-             weatherCondition ="Rain";
-         } else if(weathercode >= 71L && weathercode <= 77L) {
-             weatherCondition = "Snow";
-         } else if (weathercode >= 45L && weathercode <= 48L) {
-             weatherCondition = "Fog";
-         } else if (weathercode >= 95 && weathercode <= 99) {
-             weatherCondition = "Thunderstorm";
-         }
-         
-         return weatherCondition;
+        String weatherCondition = "";
+        if(weathercode == 0L) {
+            weatherCondition = "Clear Sky";
+        } else if(weathercode >= 1L && weathercode <= 3L) {
+            weatherCondition = "Sunny"; // Adjust this condition to represent sunny weather
+        } else if(weathercode >= 51L && weathercode <= 67L || (weathercode >= 80L && weathercode <= 99L)) {
+            weatherCondition ="Rain";
+        } else if(weathercode >= 71L && weathercode <= 82L) {
+            weatherCondition = "Snow";
+        } else if (weathercode >= 45L && weathercode <= 48L) {
+            weatherCondition = "Fog";
+        } else if (weathercode >= 95 && weathercode <= 99) {
+            weatherCondition = "Thunderstorm";
+        } else {
+            weatherCondition = "Unobserved";
+        }
+
+        return weatherCondition;
     }
+
             
     public static String getZone(ZonedDateTime localZonedDateTime) {
     String cityName = "Unknown City";
@@ -413,12 +433,18 @@ public class WeatherAppUI extends javax.swing.JFrame {
         SearchBox = new javax.swing.JTextField();
         SearchButton = new javax.swing.JButton();
         WeatherCondition_Display = new javax.swing.JLabel();
+        Display_Text = new javax.swing.JLabel();
         BottomFrame = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
-        Time_Display = new javax.swing.JLabel();
         WindSpeed_Display = new javax.swing.JLabel();
         Humidity_Display = new javax.swing.JLabel();
         Temperature_Display = new javax.swing.JLabel();
+        icon_humid = new javax.swing.JLabel();
+        icon_temp = new javax.swing.JLabel();
+        Time_Display = new javax.swing.JLabel();
+        Location_Search_Display = new javax.swing.JLabel();
+        Display_Text1 = new javax.swing.JLabel();
+        Display_Text2 = new javax.swing.JLabel();
         background = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -442,15 +468,19 @@ public class WeatherAppUI extends javax.swing.JFrame {
 
         jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/weatherappant/location_icon.png"))); // NOI18N
 
-        Weather_Display.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Assets/cloudy_night.png"))); // NOI18N
+        Weather_Display.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        Weather_Display.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Assets/cloudy_sunny.png"))); // NOI18N
 
-        SearchBox.setText("location..");
+        SearchBox.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        SearchBox.setForeground(new java.awt.Color(204, 204, 204));
         SearchBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 SearchBoxActionPerformed(evt);
             }
         });
 
+        SearchButton.setBackground(new java.awt.Color(51, 51, 51));
+        SearchButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         SearchButton.setText("Search");
         SearchButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -459,36 +489,46 @@ public class WeatherAppUI extends javax.swing.JFrame {
         });
 
         WeatherCondition_Display.setFont(new java.awt.Font("Agency FB", 1, 24)); // NOI18N
-        WeatherCondition_Display.setForeground(new java.awt.Color(204, 130, 105));
-        WeatherCondition_Display.setText("Condition");
+        WeatherCondition_Display.setForeground(new java.awt.Color(203, 153, 126));
+        WeatherCondition_Display.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        WeatherCondition_Display.setText("Weather");
+
+        Display_Text.setFont(new java.awt.Font("Agency FB", 1, 18)); // NOI18N
+        Display_Text.setForeground(new java.awt.Color(204, 204, 204));
+        Display_Text.setText("Location");
 
         javax.swing.GroupLayout MainFrameLayout = new javax.swing.GroupLayout(MainFrame);
         MainFrame.setLayout(MainFrameLayout);
         MainFrameLayout.setHorizontalGroup(
             MainFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(MainFrameLayout.createSequentialGroup()
-                .addGroup(MainFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(MainFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(MainFrameLayout.createSequentialGroup()
                         .addGap(81, 81, 81)
                         .addGroup(MainFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(Day_Display, javax.swing.GroupLayout.PREFERRED_SIZE, 235, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(Month_Display, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(MainFrameLayout.createSequentialGroup()
-                        .addGap(19, 19, 19)
-                        .addComponent(SearchButton)
-                        .addGap(26, 26, 26)
-                        .addComponent(SearchBox, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(MainFrameLayout.createSequentialGroup()
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, MainFrameLayout.createSequentialGroup()
                         .addGap(56, 56, 56)
-                        .addGroup(MainFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(WeatherCondition_Display, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(Location_Display, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(Weather_Display, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(MainFrameLayout.createSequentialGroup()
+                        .addGap(91, 91, 91)
+                        .addComponent(SearchBox, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(MainFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(MainFrameLayout.createSequentialGroup()
-                                .addComponent(jLabel3)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(Location_Display, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(Weather_Display)))))
-                .addContainerGap(83, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(SearchButton))
+                            .addGroup(MainFrameLayout.createSequentialGroup()
+                                .addGap(2, 2, 2)
+                                .addComponent(WeatherCondition_Display, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addGroup(MainFrameLayout.createSequentialGroup()
+                        .addGap(105, 105, 105)
+                        .addComponent(Display_Text)))
+                .addContainerGap(67, Short.MAX_VALUE))
         );
         MainFrameLayout.setVerticalGroup(
             MainFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -496,19 +536,24 @@ public class WeatherAppUI extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(Day_Display, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(Month_Display)
-                .addGap(7, 7, 7)
-                .addGroup(MainFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel3)
-                    .addComponent(Location_Display)
-                    .addComponent(Weather_Display, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                .addGroup(MainFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(MainFrameLayout.createSequentialGroup()
+                        .addComponent(Month_Display)
+                        .addGap(29, 29, 29)
+                        .addGroup(MainFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(MainFrameLayout.createSequentialGroup()
+                                .addComponent(Display_Text)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(Location_Display))
+                            .addComponent(jLabel3)))
+                    .addComponent(Weather_Display, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(9, 9, 9)
                 .addComponent(WeatherCondition_Display)
-                .addGap(69, 69, 69)
+                .addGap(36, 36, 36)
                 .addGroup(MainFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(SearchButton)
-                    .addComponent(SearchBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(69, 69, 69))
+                    .addComponent(SearchBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(SearchButton))
+                .addGap(89, 89, 89))
         );
 
         Weather_Display.getAccessibleContext().setAccessibleName("Weather_Display");
@@ -521,63 +566,118 @@ public class WeatherAppUI extends javax.swing.JFrame {
         jLabel2.setForeground(new java.awt.Color(97, 76, 68));
         jLabel2.setText("PandaCloud");
 
+        WindSpeed_Display.setFont(new java.awt.Font("Agency FB", 1, 18)); // NOI18N
+        WindSpeed_Display.setForeground(new java.awt.Color(221, 190, 169));
+        WindSpeed_Display.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        WindSpeed_Display.setText("..");
+        WindSpeed_Display.setToolTipText("");
+        WindSpeed_Display.setVerticalAlignment(javax.swing.SwingConstants.TOP);
+        WindSpeed_Display.setVerticalTextPosition(javax.swing.SwingConstants.TOP);
+
+        Humidity_Display.setFont(new java.awt.Font("Agency FB", 1, 18)); // NOI18N
+        Humidity_Display.setForeground(new java.awt.Color(221, 190, 169));
+        Humidity_Display.setText("..");
+
+        Temperature_Display.setFont(new java.awt.Font("Agency FB", 1, 18)); // NOI18N
+        Temperature_Display.setForeground(new java.awt.Color(221, 190, 169));
+        Temperature_Display.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        Temperature_Display.setText("F* ");
+        Temperature_Display.setVerticalAlignment(javax.swing.SwingConstants.TOP);
+
+        icon_humid.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Assets/meteorology.png"))); // NOI18N
+
+        icon_temp.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Assets/temperature.png"))); // NOI18N
+
         Time_Display.setFont(new java.awt.Font("Agency FB", 1, 18)); // NOI18N
         Time_Display.setForeground(new java.awt.Color(204, 204, 204));
         Time_Display.setText("1:28 PM");
 
-        WindSpeed_Display.setText("WindSpeed");
+        Location_Search_Display.setFont(new java.awt.Font("Agency FB", 1, 48)); // NOI18N
+        Location_Search_Display.setForeground(new java.awt.Color(204, 204, 204));
+        Location_Search_Display.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 
-        Humidity_Display.setText("Humidity");
+        Display_Text1.setFont(new java.awt.Font("Agency FB", 1, 18)); // NOI18N
+        Display_Text1.setForeground(new java.awt.Color(204, 204, 204));
+        Display_Text1.setText("Humidity");
 
-        Temperature_Display.setText("Temp");
+        Display_Text2.setFont(new java.awt.Font("Agency FB", 1, 18)); // NOI18N
+        Display_Text2.setForeground(new java.awt.Color(204, 204, 204));
+        Display_Text2.setText("Windspeed");
 
         javax.swing.GroupLayout BottomFrameLayout = new javax.swing.GroupLayout(BottomFrame);
         BottomFrame.setLayout(BottomFrameLayout);
         BottomFrameLayout.setHorizontalGroup(
             BottomFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(BottomFrameLayout.createSequentialGroup()
-                .addGap(37, 37, 37)
+                .addGap(11, 11, 11)
+                .addComponent(icon_humid, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(BottomFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(BottomFrameLayout.createSequentialGroup()
-                        .addComponent(Temperature_Display, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
+                        .addGap(187, 187, 187)
+                        .addComponent(icon_temp))
                     .addGroup(BottomFrameLayout.createSequentialGroup()
-                        .addComponent(WindSpeed_Display, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(BottomFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(Display_Text1)
+                            .addComponent(Humidity_Display, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(26, 26, 26)
+                        .addGroup(BottomFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(Display_Text2)
+                            .addComponent(WindSpeed_Display, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addGap(18, 18, 18)
+                .addGroup(BottomFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(BottomFrameLayout.createSequentialGroup()
+                        .addComponent(Time_Display)
+                        .addGap(0, 14, Short.MAX_VALUE))
+                    .addComponent(Temperature_Display, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, BottomFrameLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(BottomFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, BottomFrameLayout.createSequentialGroup()
                         .addComponent(jLabel2)
                         .addContainerGap())
-                    .addGroup(BottomFrameLayout.createSequentialGroup()
-                        .addComponent(Humidity_Display, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 174, Short.MAX_VALUE)
-                        .addComponent(Time_Display)
-                        .addGap(20, 20, 20))))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, BottomFrameLayout.createSequentialGroup()
+                        .addComponent(Location_Search_Display, javax.swing.GroupLayout.PREFERRED_SIZE, 350, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(22, 22, 22))))
         );
         BottomFrameLayout.setVerticalGroup(
             BottomFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, BottomFrameLayout.createSequentialGroup()
-                .addGap(49, 49, 49)
-                .addGroup(BottomFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(Time_Display)
-                    .addComponent(Humidity_Display))
+                .addContainerGap()
+                .addComponent(Location_Search_Display, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(BottomFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(BottomFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(BottomFrameLayout.createSequentialGroup()
+                        .addGroup(BottomFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(BottomFrameLayout.createSequentialGroup()
+                                .addGroup(BottomFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(Display_Text1)
+                                    .addComponent(Display_Text2))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(BottomFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(Humidity_Display)
+                                    .addComponent(WindSpeed_Display, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(icon_humid, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(BottomFrameLayout.createSequentialGroup()
+                        .addGroup(BottomFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(Temperature_Display, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(icon_temp, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(Time_Display)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel2)
-                        .addGap(27, 27, 27))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, BottomFrameLayout.createSequentialGroup()
-                        .addComponent(WindSpeed_Display, javax.swing.GroupLayout.DEFAULT_SIZE, 29, Short.MAX_VALUE)
-                        .addGap(18, 18, 18)))
-                .addComponent(Temperature_Display)
-                .addContainerGap(50, Short.MAX_VALUE))
+                        .addGap(42, 42, 42))))
         );
 
-        getContentPane().add(BottomFrame, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 340, 400, 190));
+        getContentPane().add(BottomFrame, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 340, 400, 210));
 
         background.setForeground(new java.awt.Color(153, 255, 153));
         background.setIcon(new javax.swing.ImageIcon("C:\\Users\\pokec\\OneDrive\\Documents\\NetBeansProjects\\WeatherAppAnt\\src\\weatherappant\\weather_background.png")); // NOI18N
         getContentPane().add(background, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 510, 550));
 
-        setSize(new java.awt.Dimension(410, 535));
+        setSize(new java.awt.Dimension(410, 555));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -625,8 +725,12 @@ public class WeatherAppUI extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel BottomFrame;
     private javax.swing.JLabel Day_Display;
+    private javax.swing.JLabel Display_Text;
+    private javax.swing.JLabel Display_Text1;
+    private javax.swing.JLabel Display_Text2;
     private javax.swing.JLabel Humidity_Display;
     private javax.swing.JLabel Location_Display;
+    private javax.swing.JLabel Location_Search_Display;
     private javax.swing.JPanel MainFrame;
     private javax.swing.JLabel Month_Display;
     private javax.swing.JTextField SearchBox;
@@ -637,6 +741,8 @@ public class WeatherAppUI extends javax.swing.JFrame {
     private javax.swing.JLabel Weather_Display;
     private javax.swing.JLabel WindSpeed_Display;
     private javax.swing.JLabel background;
+    private javax.swing.JLabel icon_humid;
+    private javax.swing.JLabel icon_temp;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     // End of variables declaration//GEN-END:variables
